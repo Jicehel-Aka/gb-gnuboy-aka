@@ -1,0 +1,2 @@
+Mets tes ROM Game Boy (.gb, .gbc) ici, en vrac ou rangees dans des sous-dossiers.
+Le lanceur affiche ce dossier au demarrage.

@@ -1,0 +1,149 @@
+# ============================================================================
+# CI PC : compile Linux + Windows, lance les tests, produit .tar.gz et .zip.
+#
+# Projet : gb-gnuboy-aka (Gamebuino AKA). Auteur : Jicehel. Voir README.md.
+# ============================================================================
+name: Build PC (Linux + Windows)
+
+on:
+  push:
+    branches: [main, master]
+    paths-ignore: ['**.md']
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      version:
+        description: "Nom de version (ex. v1.0.0) utilisé dans les noms de fichiers"
+        type: string
+        default: "dev"
+
+env:
+  VERSION: ${{ inputs.version || format('dev-{0}', github.sha) }}
+
+jobs:
+  linux:
+    name: Linux x86_64
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Dépendances
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cmake build-essential libsdl2-dev
+
+      - name: Compiler
+        run: |
+          cmake -S pc -B build-pc -DCMAKE_BUILD_TYPE=Release
+          cmake --build build-pc --parallel
+
+      - name: Test du navigateur de dossiers (ASAN/UBSAN)
+        run: |
+          gcc -std=gnu11 -Wall -Wextra -fsanitize=address,undefined \
+            -Icomponents/gbrt_aka/include tests/test_browser.c components/gbrt_aka/src/gbrt_browser.c -o test_browser
+          ./test_browser
+
+      - name: Tests de non-régression (conversion couleur exhaustive, saut d'affichage, mode Game Boy Color)
+        run: |
+          R=components/gbrt_aka
+          gcc -std=gnu11 -O2 -Wno-unused-function -I$R/include -Icomponents/gnuboy tests/test_convert.c $R/src/gbrt_aka.c $R/src/gbrt_zip.c components/gnuboy/*.c -o test_convert -lm
+          ./test_convert
+          gcc -std=gnu11 -O2 -Wno-unused-function -I$R/include -Icomponents/gnuboy tests/test_saveid.c $R/src/gbrt_aka.c $R/src/gbrt_zip.c components/gnuboy/*.c -o test_saveid -lm
+          ./test_saveid
+          python3 tools/make_test_rom.py test.gb
+          gcc -std=gnu11 -O2 -Wno-unused-function -I$R/include -Icomponents/gnuboy host_test/frameskip_test.c $R/src/gbrt_aka.c $R/src/gbrt_zip.c components/gnuboy/*.c -o frameskip_test -lm
+          ./frameskip_test test.gb
+          python3 tools/make_cgb_test_rom.py test.gbc
+          gcc -std=gnu11 -O2 -Wno-unused-function -I$R/include -Icomponents/gnuboy tests/test_cgb.c $R/src/gbrt_aka.c $R/src/gbrt_zip.c components/gnuboy/*.c -o test_cgb -lm
+          ./test_cgb test.gbc
+
+      - name: Test des ROM dans un .zip (décodeur deflate, erreurs, ASAN/UBSAN)
+        run: |
+          R=components/gbrt_aka
+          python3 tools/make_zip_fixtures.py zipfix
+          gcc -std=gnu11 -Wall -Wextra -g -fsanitize=address,undefined -I$R/include tests/test_zip.c $R/src/gbrt_zip.c -o test_zip
+          ./test_zip zipfix
+
+      - name: Test de fumée (ROM synthétique, SDL sans écran ni son)
+        env:
+          SDL_VIDEODRIVER: dummy
+          SDL_AUDIODRIVER: dummy
+        run: |
+          python3 tools/make_test_rom.py test.gb
+          ./build-pc/gb_gnuboy_pc --frames 120 --hash test.gb | tee smoke.txt
+          grep -q '^frames=120 ' smoke.txt
+
+      - name: Empaqueter
+        run: |
+          d="gb-gnuboy-pc-linux-x86_64-${VERSION}"
+          mkdir -p "$d"
+          cp build-pc/gb_gnuboy_pc "$d/"
+          cp components/gnuboy/COPYING "$d/LICENSE-gnuboy-GPLv2.txt"
+          cp pc/LISEZMOI-PC.txt "$d/LISEZMOI.txt"
+          mkdir -p "$d/roms" && cp pc/roms/LISEZMOI.txt "$d/roms/"
+          tar czf "$d.tar.gz" "$d"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pc-linux
+          path: gb-gnuboy-pc-linux-x86_64-*.tar.gz
+          if-no-files-found: error
+
+  windows:
+    name: Windows x64
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-SDL2
+            mingw-w64-x86_64-python
+
+      - name: Compiler
+        run: |
+          cmake -S pc -B build-pc -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build-pc --parallel
+
+      - name: Test de fumée (ROM synthétique, SDL sans écran ni son)
+        env:
+          SDL_VIDEODRIVER: dummy
+          SDL_AUDIODRIVER: dummy
+        run: |
+          python tools/make_test_rom.py test.gb
+          ./build-pc/gb_gnuboy_pc.exe --frames 120 --hash test.gb | tee smoke.txt
+          grep -q '^frames=120 ' smoke.txt
+
+      - name: Empaqueter (exécutable + DLL nécessaires)
+        run: |
+          d="gb-gnuboy-pc-windows-x64-${VERSION}"
+          mkdir -p "$d"
+          cp build-pc/gb_gnuboy_pc.exe "$d/"
+          # Copie les DLL MinGW dont dépend l'exécutable (SDL2.dll, etc.), pas celles de Windows.
+          ldd build-pc/gb_gnuboy_pc.exe | awk '/mingw64/ {print $3}' | while read -r dll; do cp -v "$dll" "$d/"; done
+          cp components/gnuboy/COPYING "$d/LICENSE-gnuboy-GPLv2.txt"
+          cp pc/LISEZMOI-PC.txt "$d/LISEZMOI.txt"
+          mkdir -p "$d/roms" && cp pc/roms/LISEZMOI.txt "$d/roms/"
+          ls -la "$d"
+
+      - name: Zip
+        shell: pwsh
+        run: |
+          $d = "gb-gnuboy-pc-windows-x64-$env:VERSION"
+          Compress-Archive -Path $d -DestinationPath "$d.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pc-windows
+          path: gb-gnuboy-pc-windows-x64-*.zip
+          if-no-files-found: error

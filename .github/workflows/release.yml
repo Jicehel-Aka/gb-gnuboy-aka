@@ -1,0 +1,53 @@
+# ============================================================================
+# Publication : sur un tag v*, appelle les deux builds puis crée la release GitHub (firmware, SD_files.zip, archives PC).
+#
+# Projet : gb-gnuboy-aka (Gamebuino AKA). Auteur : Jicehel. Voir README.md.
+# ============================================================================
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version (ex. v1.0.0) — crée la release sur le tag du même nom, qui doit exister"
+        required: true
+        type: string
+
+jobs:
+  aka:
+    uses: ./.github/workflows/build-aka.yml
+    with:
+      version: ${{ inputs.version || github.ref_name }}
+
+  pc:
+    uses: ./.github/workflows/build-pc.yml
+    with:
+      version: ${{ inputs.version || github.ref_name }}
+
+  release:
+    name: Publier la release
+    needs: [aka, pc]
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Contenu de la release
+        run: find artifacts -type f | sort
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.version || github.ref_name }}
+          name: ${{ inputs.version || github.ref_name }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            artifacts/aka-firmware/*.bin
+            artifacts/aka-firmware/*.zip
+            artifacts/pc-linux/*.tar.gz
+            artifacts/pc-windows/*.zip

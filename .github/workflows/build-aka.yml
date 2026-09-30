@@ -1,0 +1,78 @@
+# ============================================================================
+# CI console : compile le firmware ESP32-S3 avec ESP-IDF et prépare SD_files.zip (dossier à copier sur la carte SD).
+#
+# Projet : gb-gnuboy-aka (Gamebuino AKA). Auteur : Jicehel. Voir README.md.
+# ============================================================================
+name: Build AKA (ESP32-S3)
+
+on:
+  push:
+    branches: [main, master]
+    paths-ignore: ['**.md']
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      version:
+        description: "Nom de version (ex. v1.0.0) utilisé dans les noms de fichiers"
+        type: string
+        default: "dev"
+
+env:
+  VERSION: ${{ inputs.version || format('dev-{0}', github.sha) }}
+  # Version d'ESP-IDF : mets ici celle avec laquelle tu compiles tes autres jeux AKA.
+  IDF_VERSION: v5.4
+
+jobs:
+  aka:
+    name: Firmware AKA (esp32s3)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Vérifier les fichiers propres à la console
+        run: |
+          missing=0
+          for f in components/gamebuino/CMakeLists.txt sdkconfig.defaults; do
+            if [ ! -e "$f" ]; then
+              echo "::error file=$f::Fichier manquant : copie-le depuis ton projet AKA (pAKAman / Asteria) dans le dépôt."
+              missing=1
+            fi
+          done
+          # Si sdkconfig.defaults désigne une table de partitions perso, elle doit être dans le dépôt.
+          csv=$(grep -oP 'CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="\K[^"]+' sdkconfig.defaults 2>/dev/null || true)
+          if [ -n "$csv" ] && [ ! -e "$csv" ]; then
+            echo "::error file=$csv::Table de partitions référencée par sdkconfig.defaults mais absente du dépôt."
+            missing=1
+          fi
+          exit $missing
+
+      - name: Compiler avec ESP-IDF
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: ${{ env.IDF_VERSION }}
+          target: esp32s3
+          command: idf.py build
+
+      - name: Rapport de taille
+        run: |
+          ls -la build/gb_gnuboy_aka.bin
+          mkdir -p dist
+          cp build/gb_gnuboy_aka.bin "dist/gb-gnuboy-aka-${VERSION}.bin"
+          cp components/gnuboy/COPYING dist/LICENSE-gnuboy-GPLv2.txt
+
+      - name: SD_files.zip (à copier à la racine de la carte SD)
+        run: |
+          # Cartouche du loader AKA : firmware.bin + meta.json + screen.bmp + Picture.png.
+          # Seules les ROM libres (GBC_Homebrew) sont jointes ; ajoute les tiennes dans GB/ sur la carte.
+          mkdir -p sd/GB_EMULATOR sd/GB
+          cp SD_files/GB_EMULATOR/* sd/GB_EMULATOR/
+          cp build/gb_gnuboy_aka.bin sd/GB_EMULATOR/firmware.bin
+          cp -r SD_files/GB/GBC_Homebrew sd/GB/
+          (cd sd && zip -r "../dist/SD_files-${VERSION}.zip" .)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aka-firmware
+          path: dist/
+          if-no-files-found: error

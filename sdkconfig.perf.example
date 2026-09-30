@@ -1,0 +1,26 @@
+# ============================================================================
+# Réglages ESP32-S3 utiles pour la vitesse : À FUSIONNER dans TON sdkconfig.defaults (puis `idf.py fullclean`).
+#
+# Exemple non testé sur la console : à valider sur ta carte ; les noms varient un peu selon la version d'ESP-IDF.
+# Projet : gb-gnuboy-aka (Gamebuino AKA). Auteur : Jicehel. Voir README.md.
+# ============================================================================
+# Réglages ESP32-S3 utiles pour la vitesse : À FUSIONNER dans TON sdkconfig.defaults (puis `idf.py fullclean`),
+# après vérification sur ta carte. Rien ici n'est testé sur l'AKA ; les noms varient un peu selon la version d'ESP-IDF.
+
+# Compilation : vitesse plutôt que taille pour tout le projet
+CONFIG_COMPILER_OPTIMIZATION_PERF=y
+
+# Caches (S3) : plus grands = moins de défauts de cache PSRAM (ROM, framebuffer si en PSRAM)
+CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB=y
+CONFIG_ESP32S3_DATA_CACHE_64KB=y
+CONFIG_ESP32S3_DATA_CACHE_LINE_64B=y
+
+# PSRAM : la fréquence maximale que ta carte supporte (120M est expérimental en octal)
+# CONFIG_SPIRAM_SPEED_80M=y
+
+# Fréquence CPU : 240 MHz donne ~50 % de vitesse en plus qu'à 160 MHz, au prix de la consommation et de la chauffe
+# CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240=y
+
+# Ce composant : code chaud en IRAM (menuconfig > gb-gnuboy (AKA))
+CONFIG_GNUBOY_IRAM_EXTRA=y
+# (mettre CONFIG_GNUBOY_IRAM_EXTRA=n si l'IRAM deborde)

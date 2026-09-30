@@ -1,0 +1,55 @@
+# ============================================================================
+# sdkconfig.defaults — valeurs de la carte AKA pour le lecteur Game Boy (ESP32-S3, flash 8 Mo, PSRAM octale).
+# Projet : gb-gnuboy-aka (Gamebuino AKA). Auteur : Jicehel.
+#
+# Repris de sdkconfig.defaults d'AKA-Love (lui-même issu de wargame_aka, mêmes valeurs pour la carte),
+# avec les écarts propres à l'émulateur signalés « ÉMULATEUR » ci-dessous. Non testé sur la console (en panne).
+# Après modification : `idf.py fullclean` puis `idf.py build`.
+# ============================================================================
+CONFIG_IDF_TARGET="esp32s3"
+
+# --- Flash et table de partitions (la partition "loader" OTA_1 doit rester celle du loader déjà flashé) ---
+CONFIG_ESPTOOLPY_FLASHMODE_DIO=y
+CONFIG_ESPTOOLPY_FLASHFREQ_80M=y
+CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+
+# --- PSRAM : la ROM y est chargée (jusqu'à plusieurs Mo). Les blocs <= 16 Ko restent en SRAM interne. ---
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_OCT=y
+CONFIG_SPIRAM_SPEED_40M=y
+CONFIG_SPIRAM_USE_MALLOC=y
+CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=16384
+CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL=32768
+
+# --- CPU et caches ---
+# 160 MHz comme les autres jeux AKA. Si 60 images/s ne tiennent pas : CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240=y
+# (+~50 % de vitesse, plus de chauffe et de consommation) ; autres pistes dans sdkconfig.perf.example.
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_160=y
+CONFIG_ESP32S3_DATA_CACHE_32KB=y
+CONFIG_ESP32S3_INSTRUCTION_CACHE_16KB=y
+
+# --- Console série ---
+CONFIG_ESP_CONSOLE_UART_DEFAULT=y
+CONFIG_ESP_CONSOLE_SECONDARY_USB_SERIAL_JTAG=y
+
+# --- Watchdog des tâches ---
+CONFIG_ESP_TASK_WDT_TIMEOUT_S=5
+
+# --- Tick FreeRTOS 1 ms (comme AKA-Love et Galaxy Fighter) : précision des attentes de cadence ---
+CONFIG_FREERTOS_HZ=1000
+
+# --- Carte SD : noms longs (les ROM portent des noms comme « Pokemon - Version Jaune (France).gb ») ---
+CONFIG_FATFS_LFN_HEAP=y
+CONFIG_FATFS_MAX_LFN=255
+
+# --- ÉMULATEUR : vitesse plutôt que taille (au lieu de -Og) ---
+CONFIG_COMPILER_OPTIMIZATION_PERF=y
+
+# --- ÉMULATEUR : pile de la tâche principale. Le défaut d'ESP-IDF (3584 o) est trop juste : app_main exécute tout
+# le lecteur (émulation, printf de rapport avec virgule flottante, écritures FAT de sauvegarde). ---
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+
+# --- ÉMULATEUR : code chaud du PPU, de l'interpréteur et de l'audio en IRAM (voir components/gbrt_aka/Kconfig) ---
+CONFIG_GBRT_AKA_IRAM=y

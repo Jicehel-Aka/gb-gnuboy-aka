@@ -1,0 +1,7 @@
+# ROM commerciales fournies pour les tests locaux : NE PAS publier (droits d'auteur).
+# Les homebrew libres (SD_files/GB/GBC_Homebrew) restent dans le dépôt.
+SD_files/GB/Jeux_GB/
+SD_files/GB/Gros_jeux_test/
+SD_files/GBSAVES/
+build*/
+*.ppm

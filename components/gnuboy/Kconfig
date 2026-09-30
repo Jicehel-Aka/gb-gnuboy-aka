@@ -1,0 +1,14 @@
+# ============================================================================
+# Options de menuconfig du composant gnuboy (placement du code en IRAM).
+# Projet : gb-gnuboy-aka (Gamebuino AKA). Auteur : Jicehel.
+# ============================================================================
+menu "gnuboy (AKA)"
+
+    config GNUBOY_IRAM_EXTRA
+        bool "Affichage, son et bus (lcd.c, sound.c, hw.c) aussi en IRAM"
+        default y
+        help
+            L'amont ne met que le processeur (gb_cpu_emulate) en IRAM. Cette option y ajoute les fonctions d'affichage ligne par
+            ligne, de son et d'accès au bus (environ 15 à 20 Ko d'IRAM en plus). Décocher si la SRAM interne manque.
+
+endmenu

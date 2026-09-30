@@ -1,0 +1,15 @@
+{
+  "MENU_GAME_SELECT": "Cambiar de juego",
+  "MENU_VOLUME": "Volumen",
+  "MENU_VOL_SFX": "(sin uso)",
+  "MENU_LEGEND": "A:ok  C/MENU:volver",
+  "CTRL_DPAD": "Cruz: direcciones",
+  "CTRL_AB": "A / B: botones A / B",
+  "CTRL_START": "RUN: Start",
+  "CTRL_SELECT": "C: Select",
+  "CTRL_ZOOM": "L1: zoom 1x / 1,5x",
+  "CTRL_MENU": "MENU: este menu (pausa)",
+  "CTRL_SHOT": "MENU largo: captura",
+  "CTRL_LOADER": "RUN+MENU: loader",
+  "MENU_VOL_MUSIC": "Volumen"
+}

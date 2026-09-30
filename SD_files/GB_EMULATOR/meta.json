@@ -1,0 +1,7 @@
+{
+  "title": "GnuBoy MK",
+  "description": "Emulateur Game Boy et Game Boy Color : lit les ROM .gb, .gbc et .zip du dossier GB de la carte SD (sous-dossiers acceptes), avec son, sauvegardes batterie, zoom 1,5x, menu systeme (pause, volume, changer de jeu) et capture d'ecran. Base sur gnuboy (retro-go).",
+  "author": "Jicehel",
+  "version": "1.0",
+  "date": "2026-10-01"
+}
