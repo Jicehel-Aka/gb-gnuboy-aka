@@ -44,7 +44,7 @@ Les `.bin` sont des firmwares Gamebuino META (ARM) : seule la ROM qu'ils contien
 | POKEMONV.gb | GB+couleur | MBC5+RAM+pile | 1 Mo | 32 Ko |
 | SUPERDON.gb | GB | MBC1+RAM+pile | 512 Ko | 8 Ko |
 
-Les `.sav` de `SD_files/GBSAVES/` (nommés comme les ROM) se chargent sans erreur de taille ; Pokémon Jaune les relit et les réécrit à l'identique.
+Les `.sav` de `SD_files/Gnuboy_MK/saves/` (nommés comme les ROM) se chargent sans erreur de taille ; Pokémon Jaune les relit et les réécrit à l'identique.
 Les autres jeux modifient leur RAM au démarrage, ce qui est normal.
 
 ## À savoir

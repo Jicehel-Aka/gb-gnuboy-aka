@@ -64,5 +64,5 @@ Sans `gb_calloc_fast`, ESP-IDF enverrait en PSRAM tout bloc > 16 Ko.
 | `pc/` | frontend SDL2 + police 8x8 |
 | `tests/`, `host_test/` | tests automatiques et bancs de mesure |
 | `tools/` | extraction de ROM des `.bin` META, ROM synthétiques, `run_tests.sh` |
-| `SD_files/` | ce qui se copie sur la carte SD (cartouche `GB_EMULATOR`, textes du menu `AKA/lang`, ROM) |
+| `SD_files/` | ce qui se copie sur la carte SD (cartouche `Gnuboy_MK`, textes du menu `AKA/lang`, ROM) |
 | `.github/workflows/` | CI PC, CI console, release |

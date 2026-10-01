@@ -65,10 +65,11 @@ jobs:
         run: |
           # Cartouche du loader AKA : firmware.bin + meta.json + screen.bmp + Picture.png.
           # Seules les ROM libres (GBC_Homebrew) sont jointes ; ajoute les tiennes dans GB/ sur la carte.
-          mkdir -p sd/GB_EMULATOR sd/GB
-          cp SD_files/GB_EMULATOR/* sd/GB_EMULATOR/
-          cp build/gb_gnuboy_aka.bin sd/GB_EMULATOR/firmware.bin
+          mkdir -p sd/Gnuboy_MK sd/GB
+          cp -r SD_files/Gnuboy_MK/* sd/Gnuboy_MK/
+          cp build/gb_gnuboy_aka.bin sd/Gnuboy_MK/firmware.bin
           cp -r SD_files/GB/GBC_Homebrew sd/GB/
+          cp -r SD_files/AKA sd/ # textes du menu systeme (AKA/lang)
           (cd sd && zip -r "../dist/SD_files-${VERSION}.zip" .)
 
       - uses: actions/upload-artifact@v4

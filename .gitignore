@@ -2,6 +2,6 @@
 # Les homebrew libres (SD_files/GB/GBC_Homebrew) restent dans le dépôt.
 SD_files/GB/Jeux_GB/
 SD_files/GB/Gros_jeux_test/
-SD_files/GBSAVES/
+SD_files/Gnuboy_MK/saves/
 build*/
 *.ppm

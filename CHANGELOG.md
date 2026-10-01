@@ -5,7 +5,7 @@
 - Nouveau cœur : gnuboy (GPL v2) à la place de gb-recompiled : ×4,7 en médiane sur PC (×2,8 à ×6,4), ROM lue en place (1× en mémoire). Détail et limites (précision, licence) : README.
 - Patchs de gnuboy : écrasement mémoire dans `wnd_scan` (WX < 0) corrigé, accès non alignés et décalages indéfinis corrigés, IRAM / SRAM interne, sortie RGB555, palette DMG de l'ancien cœur. Voir PATCHES-GNUBOY.md.
 - Menu système AKA dans le lanceur : MENU court = pause + menu (Reprendre, Choisir un jeu, Commandes, Langue, Volume, Crédits, Retour au loader), MENU long = capture BMP, RUN+MENU = retour au loader.
-  La RAM batterie est écrite avant tout retour au loader (`gbrt_aka_flush_save()`, crochet `AkaRuntime::setBeforeExitCallback`). Textes : `SD_files/AKA/lang`, `SD_files/GB_EMULATOR/lang`.
+  La RAM batterie est écrite avant tout retour au loader (`gbrt_aka_flush_save()`, crochet `AkaRuntime::setBeforeExitCallback`). Textes : `SD_files/AKA/lang`, `SD_files/Gnuboy_MK/lang`.
 - Inchangés : sélecteur de ROM, zips, `.gb` / `.gbc`, frontend PC.
 - Sauvegardes : un seul `.sav` au format gnuboy ; `.rtc` abandonné. Anciens `.sav` de MBC2 non repris.
 - Mesuré : 21 ROM × 1500 images sous ASAN/UBSAN, tests unitaires, CGB, zips. **Non testé sur la console** ni compilé avec ESP-IDF.
@@ -37,7 +37,7 @@
 - Sélecteur : 1024 entrées par dossier au lieu de 512 (le dossier `Japan` du jeu de ROM zippées en a 773).
 - `components/` complété : `gamebuino` (version récente), `aka_runtime`, `aka_font`. Le lanceur a été compilé (`-Wall -Wextra -Werror`) contre les vrais en-têtes du composant, avec de simples bouchons pour les seuls en-têtes ESP-IDF.
 - `sdkconfig.defaults` et `partitions.csv` (repris d'AKA-Love) : noms longs FAT, tick 1 ms, pile principale 8 Ko (le défaut de 3,5 Ko est trop juste pour le lecteur), -O2, PSRAM octale.
-- `SD_files/` : cartouche `GB_EMULATOR` (`meta.json`, `screen.bmp`, `Picture.png`), ROM de test, sauvegardes.
+- `SD_files/` : cartouche `Gnuboy_MK` (`meta.json`, `screen.bmp`, `Picture.png`), ROM de test, sauvegardes.
 - 8 ROM homebrew libres (6 en mode couleur exclusif) + 8 jeux GB fournis (Solar Striker, Burai Fighter Deluxe, Super R.C. Pro-Am et Batman extraits des firmwares META `.bin` avec `tools/extract_meta_rom.py` ; les `.bin` de Felix the Cat et Gargoyle's Quest contiennent exactement les mêmes ROM que les `.gb` fournis, vérifié par empreinte) + 5 gros jeux de test.
 - `tools/run_tests.sh` : lance tous les tests, et toutes les ROM d'un dossier sous ASAN/UBSAN.
 - CI : test des identifiants de sauvegarde ; `SD_files-<version>.zip` (firmware + meta + images + homebrew libres) joint aux releases.

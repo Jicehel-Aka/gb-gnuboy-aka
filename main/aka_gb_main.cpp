@@ -8,7 +8,7 @@
  * - Image : RGB555 du PPU convertie directement dans `framebuffer` (BGR565 320x240), centrée en 1x
  *   ou agrandie 1,5x (L1 pour basculer), puis gb_graphics::update(). Saut d'affichage adaptatif si retard.
  * - Son : le PCM du runtime (stéréo 44100 Hz) est mixé en mono et servi au gb_audio_player par une « piste » à tampon circulaire.
- * - Sauvegardes : /sdcard/GBSAVES/<nom_rom>.sav (RAM batterie + horloge, format gnuboy)
+ * - Sauvegardes : /sdcard/Gnuboy_MK/saves/<nom_rom>.sav (RAM batterie + horloge, format gnuboy)
  *
  * Commandes en jeu : croix / joystick = croix, A = A, B = B, RUN = Start, C = Select,
  *                    L1 = zoom 1x / 1,5x, MENU court = menu système AKA (Reprendre, Choisir un jeu, Commandes, Langue, Volume, Crédits,
@@ -51,7 +51,7 @@
 #include "core/input.h"
 
 #define GB_DIR   MOUNT_POINT "/GB"
-#define SAVE_DIR MOUNT_POINT "/GBSAVES" /* hors de /GB : le sélecteur ne le montre pas */
+#define SAVE_DIR MOUNT_POINT "/Gnuboy_MK/saves" /* hors de /GB (le sélecteur ne le montre pas) et distinct des sauvegardes de l'autre émulateur */
 
 static_assert(sizeof(gb_pixel) == 2, "USE_VIDEO_256_INDEXED n'est pas supporté par ce lecteur (BGR565 requis)");
 
@@ -320,7 +320,7 @@ static bool pick_rom(GbrtBrowser *br, std::string &path) {
 
 /* ------------------------------------------------------------------ */
 
-/* Point d'entrée ESP-IDF : initialise la console, crée /GB et /GBSAVES, puis boucle sélecteur -> jeu -> sélecteur. */
+/* Point d'entrée ESP-IDF : initialise la console, crée /GB et /Gnuboy_MK/saves, puis boucle sélecteur -> jeu -> sélecteur. */
 extern "C" void app_main(void) {
     static gb_audio_player audio;
     g_audio = &audio;
@@ -333,11 +333,10 @@ extern "C" void app_main(void) {
     gfx.set_refresh_rate(60); /* ~59,73 Hz natif : évite le battement avec le vsync 70/35 Hz */
     audio.add_track(&g_track, 1.0f);
     mkdir(GB_DIR, 0777);
-    mkdir(SAVE_DIR, 0777);
 
     /* Menu système AKA (MENU court), capture (MENU long) et retour au loader (RUN+MENU). Les textes viennent de
-     * /sdcard/AKA/lang/<langue>.json et /sdcard/GB_EMULATOR/lang/<langue>.json (fournis dans SD_files/). */
-    akaRuntime.begin("GB_EMULATOR");
+     * /sdcard/AKA/lang/<langue>.json et /sdcard/Gnuboy_MK/lang/<langue>.json (fournis dans SD_files/). */
+    akaRuntime.begin("Gnuboy_MK");
     static const char *const kControls[] = {"CTRL_DPAD", "CTRL_AB", "CTRL_START", "CTRL_SELECT", "CTRL_ZOOM", "CTRL_MENU", "CTRL_SHOT", "CTRL_LOADER", nullptr};
     akaRuntime.setControlsKeys(kControls);
     akaRuntime.setCredits("Game Boy (gnuboy)", "Jicehel / gnuboy", "GPL v2 (coeur gnuboy)", "github.com/ducalex/retro-go");
@@ -345,6 +344,7 @@ extern "C" void app_main(void) {
     akaRuntime.setVolumeChangedCallback(on_volume);
     akaRuntime.setBeforeExitCallback(on_before_exit);
     g_track.set_volume(akaRuntime.getMusicVolume());
+    mkdir(SAVE_DIR, 0777); /* après begin() : il crée /sdcard/Gnuboy_MK, dossier parent des sauvegardes */
 
     GbrtBrowser browser;
     if (!gbrt_browser_open(&browser, GB_DIR)) {
