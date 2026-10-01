@@ -1,0 +1,22 @@
+Game Boy (gnuboy) - version PC
+
+Lancer :   gb_gnuboy_pc            ouvre le lanceur sur le dossier "roms" a cote du programme
+           gb_gnuboy_pc  dossier    ouvre le lanceur sur ce dossier
+           gb_gnuboy_pc  ma_rom.gb  lance directement la ROM (Windows : glisse la ROM sur le .exe)
+Linux :    installe SDL2 (Debian/Ubuntu : sudo apt install libsdl2-2.0-0)
+
+Lanceur (sous-dossiers acceptes)
+  Haut / Bas, molette   choisir              Page precedente / suivante   defiler
+  Entree, X, Espace     jouer / ouvrir       Retour arriere, Z, Gauche    dossier parent
+  Echap                 quitter
+
+En jeu
+  Croix          Fleches ou W A S D
+  A / B          X ou Espace / Z ou B
+  Start / Select Entree / Retour arriere ou Maj droite
+  Plein ecran    F11
+  Echap          retour au lanceur (ferme la fenetre pour quitter)
+
+Options : --scale N (taille de la fenetre, defaut 4)
+Sauvegardes : dossier utilisateur SDL (gnuboy/aka), un .sav par nom de ROM.
+Pas de menu systeme AKA sur PC (Echap = retour au lanceur). Les ROM ne sont pas fournies. Coeur : gnuboy, GPL v2, voir LICENSE-gnuboy-GPLv2.txt.

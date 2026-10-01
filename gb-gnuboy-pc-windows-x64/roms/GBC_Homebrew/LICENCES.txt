@@ -1,0 +1,16 @@
+ROM homebrew Game Boy Color libres, jointes pour tester le mode couleur de l'emulateur.
+Source : base gbdev (https://github.com/gbdev/database) ; chaque jeu appartient a ses auteurs et reste sous sa licence.
+
+Fichier              Jeu / auteurs                               Licence            Code source
+-------------------  ------------------------------------------  -----------------  --------------------------------------------
+Aevilia.gbc          Aevilia (ISSOtm, Kai, Parzival, Charmy)     Apache-2.0         https://github.com/ISSOtm/Aevilia-GB
+CatMario-GB.gbc      CatMario-GB (Lazy_V)                        MIT                https://github.com/zzxzzk115/CatMarioGB
+CrossConnect.gbc     CrossConnect (quinnp)                       MIT                https://github.com/QuinnPainter/CrossConnect
+Geometrix.gbc        Geometrix (AntonioND)                       GPL-3.0-or-later   https://github.com/AntonioND/geometrix
+uCity.gbc            uCity (AntonioND)                           GPL-3.0-or-later   https://github.com/AntonioND/ucity
+Rebound.gbc          Rebound (DevEd)                             MIT                https://github.com/DevEd2/ReboundGB/
+A_Slime_Travel.gbc   A Slime Travel (Dribble Studios)            Zlib               (voir la fiche gbdev : a-slime-travel)
+GBHack.gbc           GBHack (statico)                            MIT                https://github.com/statico/gbhack
+
+Les textes de licence fournis avec les jeux sont dans le dossier licences/ (CatMario-GB, uCity).
+Geometrix et uCity sont sous GPL : le code source correspondant est disponible aux adresses ci-dessus.
