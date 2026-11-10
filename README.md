@@ -158,3 +158,9 @@ Le composant `gamebuino` (LGPL v3, Gamebuino / Jean-Marie Papillon) est inclus a
 (ce n'est pas un avis juridique). `aka_runtime` et `aka_font` sont les tiens. Si tu veux une licence permissive, garde la variante `gb-recompiled-aka` (MIT).
 Les ROM homebrew de `SD_files/GB/GBC_Homebrew` gardent la licence de leurs auteurs ([LICENCES.txt](SD_files/GB/GBC_Homebrew/LICENCES.txt)).
 Les jeux commerciaux fournis pour les tests (`Jeux_GB/`, `Gros_jeux_test/`) sont exclus du dépôt git par `.gitignore` : ne les publie pas.
+
+## Projets d'origine et licence
+
+- **Cœur d'émulation : gnuboy** — émulateur Game Boy / Game Boy Color écrit par **Laguna** (conception et programme principal) avec **Gilgamesh** et les contributeurs de gnuboy (voir [components/gnuboy/CREDITS](components/gnuboy/CREDITS)), dans la version adaptée du projet **retro-go** de **ducalex** (<https://github.com/ducalex/retro-go>).
+- **Licence : GNU GPL version 2**, la même que gnuboy. Le texte complet est dans [LICENSE](LICENSE) (copie de [components/gnuboy/COPYING](components/gnuboy/COPYING)). Le portage Gamebuino AKA est distribué sous cette même licence.
+- Les ROM d'exemple de `SD_files/GB/GBC_Homebrew/` gardent la licence de leurs auteurs (voir `LICENCES.txt` et le dossier `licences/`).
